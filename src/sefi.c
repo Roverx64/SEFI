@@ -95,6 +95,11 @@ void sprint(CHAR16 *string, ...){
                     printHex(va_arg(args,uint64_t),bytes,true);
                 }
                 break;
+                case 's':
+                sefiST->ConOut->OutputString(sefiST->ConOut,(CHAR16*)va_arg(args,CHAR16*));
+                break;
+                default:
+                break;
             }
             bytes = sizeof(int);
         }
