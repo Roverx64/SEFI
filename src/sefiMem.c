@@ -3,6 +3,10 @@
 extern EFI_HANDLE sefiIH;
 extern EFI_SYSTEM_TABLE *sefiST;
 
+/*!
+    AllocPool() wrapper.  
+    Returns NULL on failure.
+*/
 void *allocPool(UINTN sz){
     void *ptr = NULL;
     EFI_STATUS status = sefiST->BS->AllocatePool(EfiLoaderData,sz,&ptr);
@@ -10,22 +14,38 @@ void *allocPool(UINTN sz){
     return ptr;
 }
 
+/*!
+    FreePool() wrapper.
+*/
 void freePool(void *ptr){
     sefiST->BS->FreePool(&ptr);
 }
 
+/*!
+    CopyMem() wrapper.
+*/
 void efimemcpy(void *s, void *d, UINTN sz){
     sefiST->BS->CopyMem(d,s,sz);
 }
 
+/*!
+    SetMem() wrapper.
+*/
 void efimemset(void *ptr, UINTN sz, UINT8 set){
     sefiST->BS->SetMem(ptr,sz,set);
 }
 
+/*!
+    Clears a section of memory of 'sz' to 0x0
+*/
 void clearMem(void *ptr, UINTN sz){
     efimemset(ptr,sz,0x0);
 }
 
+/*!
+    Typical C realloc().  
+    Returns NULL on failure.
+*/
 void *reallocPool(void *ptr, UINTN osz, UINTN nsz){
     void *np = allocPool(nsz);
     if(!np){return NULL;}
@@ -36,7 +56,11 @@ void *reallocPool(void *ptr, UINTN osz, UINTN nsz){
 
 void *oldmmapptr = NULL;
 
-//Returns the memory map
+/*!
+    Returns the UEFI memory map.  
+    Returns NULL on failure.  
+    Do not free the returned pointer; SEFI will do that for you.
+*/
 EFI_MEMORY_DESCRIPTOR *getMmap(UINTN *entries, UINTN *key, UINTN *descSize, UINT32 *descVersion){
     EFI_MEMORY_DESCRIPTOR *map = NULL;
     *entries = 0x0;

@@ -3,9 +3,12 @@
 
 //Basic abstraction library for polarboot, or any bootloader, to UEFI
 
-EFI_HANDLE sefiIH;
-EFI_SYSTEM_TABLE *sefiST;
+EFI_HANDLE sefiIH; //!< SEFI's ImageHandle
+EFI_SYSTEM_TABLE *sefiST; //!< SEFI's SystemTable
 
+/*!
+    Intilizes SEFI and must be called before using SEFI functions.
+*/
 void initSEFI(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable){
     sefiIH = ImageHandle;
     sefiST = SystemTable;
@@ -15,15 +18,22 @@ void initSEFI(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE *SystemTable){
     sefiST->ConOut->SetCursorPosition(sefiST->ConOut,0,0);
 }
 
-CHAR16 hexOut[17]; //64 bit limit is 16 characters
+//64 bit limit is 16 characters
+CHAR16 hexOut[17]; //!< sprint() buffer for hex output.
 
+/*!
+    simple strlen function.
+*/
 int efistrlen(CHAR16 *str){
     int i = 0;
     while(str[i] != '\0'){++i;}
     return i;
 }
 
-//Taken from RoverOS' code and modified
+/*!
+    Prints out a hex number.
+    Taken from RoverOS' code and modified
+*/
 void printHex(uint64_t num,uint16_t bytes,bool caps){
     int s = 0;
     uint8_t nibble = 0x0;
@@ -52,6 +62,11 @@ void printHex(uint64_t num,uint16_t bytes,bool caps){
     sprint((CHAR16*)&hexOut);
 }
 
+/*!
+    Basic printf function with limited modifier support.  
+    (%s, %x, and l/ll modifiers).  
+    Strings must be CHAR16.
+*/
 void sprint(CHAR16 *string, ...){
     CHAR16 *nstr = allocPool(sizeof(CHAR16)*(efistrlen(string)+1));
     int pstr = 0;
@@ -115,7 +130,8 @@ void sprint(CHAR16 *string, ...){
     freePool(nstr);
 }
 
-/*! Returns true if GUID matches
+/*!
+    Compares two GUIDs and returns true if GUID matches.
 */
 BOOLEAN testGUID(EFI_GUID *t1, EFI_GUID *t2){
     if(*((UINT128*)t1) != *((UINT128*)t2)){return false;}
